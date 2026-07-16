@@ -23,6 +23,10 @@ const cycleRange = document.querySelector("#cycleRange");
 const previousCycleButton = document.querySelector("#previousCycleButton");
 const currentCycleButton = document.querySelector("#currentCycleButton");
 const nextCycleButton = document.querySelector("#nextCycleButton");
+const formModeLabel = document.querySelector("#formModeLabel");
+const formTitle = document.querySelector("#formTitle");
+const submitExpenseButton = document.querySelector("#submitExpenseButton");
+const cancelEditButton = document.querySelector("#cancelEditButton");
 
 const today = new Date();
 dateInput.value = today.toISOString().slice(0, 10);
@@ -32,6 +36,7 @@ let syncConfig = JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY) || "{}");
 let cloudReady = false;
 let noteTimer = null;
 let selectedCycleOffset = 0;
+let editingRecordId = null;
 
 quickNote.value = localStorage.getItem(NOTE_STORAGE_KEY) || "";
 apiBaseInput.value = syncConfig.apiBase || DEFAULT_API_BASE;
@@ -65,6 +70,29 @@ function setText(selector, value) {
 function setSyncStatus(message, isError = false) {
   syncStatus.textContent = message;
   syncStatus.classList.toggle("error", isError);
+}
+
+function setFormMode(record = null) {
+  editingRecordId = record ? record.id : null;
+  formModeLabel.textContent = record ? "EDIT RECORD" : "NEW RECORD";
+  formTitle.textContent = record ? "编辑花销" : "记一笔";
+  submitExpenseButton.textContent = record ? "保存修改" : "保存这笔花销";
+  cancelEditButton.hidden = !record;
+}
+
+function resetExpenseForm() {
+  form.reset();
+  dateInput.value = new Date().toISOString().slice(0, 10);
+  setFormMode(null);
+}
+
+function fillExpenseForm(record) {
+  form.amount.value = record.amount;
+  form.category.value = record.category;
+  form.date.value = record.date;
+  form.note.value = record.note || "";
+  setFormMode(record);
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 async function apiRequest(path, options = {}) {
@@ -205,9 +233,11 @@ function renderExpenses() {
     node.querySelector(".record-note").textContent = record.note || "未填写备注";
     node.querySelector(".record-amount").textContent = `-${money(record.amount)}`;
     node.querySelector(".record-date").textContent = formatDate(record.date);
+    node.querySelector(".edit-button").addEventListener("click", () => fillExpenseForm(record));
     node.querySelector(".delete-button").addEventListener("click", async () => {
       const previous = records;
       records = records.filter((item) => item.id !== record.id);
+      if (editingRecordId === record.id) resetExpenseForm();
       saveExpenses();
       renderAll();
       if (!cloudReady) return;
@@ -266,27 +296,33 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
+  const existing = editingRecordId ? records.find((item) => item.id === editingRecordId) : null;
   const record = {
-    id: crypto.randomUUID(),
+    id: existing?.id || crypto.randomUUID(),
     amount,
     category: data.get("category"),
     date: data.get("date"),
     note: data.get("note").trim(),
-    createdAt: Date.now(),
+    createdAt: existing?.createdAt || Date.now(),
   };
 
-  records.push(record);
+  const previous = records;
+  records = existing
+    ? records.map((item) => item.id === record.id ? record : item)
+    : [...records, record];
   saveExpenses();
-  form.reset();
-  dateInput.value = new Date().toISOString().slice(0, 10);
+  resetExpenseForm();
   renderAll();
 
   if (!cloudReady) return;
   try {
     await apiRequest("/expenses", { method: "POST", body: JSON.stringify(record) });
-    setSyncStatus("花销记录已同步到云端。");
+    setSyncStatus(existing ? "花销记录已更新到云端。" : "花销记录已同步到云端。");
   } catch (error) {
-    setSyncStatus(`记录同步失败：${error.message}`, true);
+    records = previous;
+    saveExpenses();
+    renderAll();
+    setSyncStatus(`${existing ? "更新" : "记录同步"}失败：${error.message}`, true);
   }
 });
 
@@ -382,6 +418,8 @@ paydayInput.addEventListener("change", () => {
   saveSyncConfig();
   renderAll();
 });
+
+cancelEditButton.addEventListener("click", resetExpenseForm);
 
 previousCycleButton.addEventListener("click", () => {
   selectedCycleOffset -= 1;

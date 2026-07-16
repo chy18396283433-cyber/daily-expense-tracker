@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#14532d" />
     <title>个人工具箱</title>
-    <link rel="stylesheet" href="style.css?v=20260716-cyclebar" />
+    <link rel="stylesheet" href="style.css?v=20260716-edit" />
   </head>
   <body>
     <div class="site-shell">
@@ -150,8 +150,8 @@
             <form class="expense-form panel" id="expenseForm">
               <div class="panel-heading">
                 <div>
-                  <p class="eyebrow">NEW RECORD</p>
-                  <h2>记一笔</h2>
+                  <p class="eyebrow" id="formModeLabel">NEW RECORD</p>
+                  <h2 id="formTitle">记一笔</h2>
                 </div>
               </div>
               <label>
@@ -180,7 +180,8 @@
                 备注 <span class="optional">可选</span>
                 <input id="note" name="note" maxlength="50" placeholder="例如：午饭、地铁、咖啡" />
               </label>
-              <button class="primary-button" type="submit">保存这笔花销</button>
+              <button class="primary-button" id="submitExpenseButton" type="submit">保存这笔花销</button>
+              <button class="secondary-button form-cancel-button" id="cancelEditButton" type="button" hidden>取消编辑</button>
             </form>
 
             <section class="records panel">
@@ -283,9 +284,12 @@
           <strong class="record-amount"></strong>
           <span class="record-date"></span>
         </div>
-        <button class="delete-button" type="button" aria-label="删除这笔记录">×</button>
+        <div class="record-actions">
+          <button class="edit-button" type="button">编辑</button>
+          <button class="delete-button" type="button" aria-label="删除这笔记录">×</button>
+        </div>
       </article>
     </template>
-    <script src="app.js?v=20260716-cyclebar"></script>
+    <script src="app.js?v=20260716-edit"></script>
   </body>
 </html>
