@@ -34,7 +34,18 @@
               <h1 id="homeTitle">把常用小工具收进一个地方</h1>
               <p class="subtitle">个人使用的轻量网站，先放记账、便签和快捷入口，后面可以继续加计算器、清单、换算器、查询页。</p>
             </div>
-            <button class="primary-button hero-action" type="button" data-route="expenses">打开记账</button>
+            <aside class="hero-widget" aria-label="工具箱状态">
+              <div class="sync-badge">云同步已接入</div>
+              <div class="hero-widget-main">
+                <span>今日入口</span>
+                <strong>每日花销</strong>
+              </div>
+              <div class="hero-widget-grid">
+                <button class="hero-mini-button" type="button" data-route="expenses">记账</button>
+                <button class="hero-mini-button" type="button" data-route="notes">便签</button>
+                <button class="hero-mini-button" type="button" data-route="settings">同步</button>
+              </div>
+            </aside>
           </header>
 
           <section class="stats-grid" aria-label="工具箱状态">
@@ -56,7 +67,7 @@
           </section>
 
           <section class="tool-grid" aria-label="小工具列表">
-            <article class="tool-card ready">
+            <article class="tool-card ready tone-money">
               <div class="tool-card-head">
                 <span class="tool-token">¥</span>
                 <span class="status-pill">可用</span>
@@ -65,7 +76,7 @@
               <p>记录支出、查看今日和本月统计，数据只保存在本机浏览器。</p>
               <button class="secondary-button" type="button" data-route="expenses">进入</button>
             </article>
-            <article class="tool-card ready">
+            <article class="tool-card ready tone-note">
               <div class="tool-card-head">
                 <span class="tool-token">N</span>
                 <span class="status-pill">可用</span>
@@ -74,7 +85,7 @@
               <p>存临时想法、待办片段、常用文字，刷新页面也会保留。</p>
               <button class="secondary-button" type="button" data-route="notes">进入</button>
             </article>
-            <article class="tool-card ready">
+            <article class="tool-card ready tone-link">
               <div class="tool-card-head">
                 <span class="tool-token">L</span>
                 <span class="status-pill">可用</span>
@@ -83,7 +94,7 @@
               <p>把常开的本地服务、文档和网页放在同一个面板里。</p>
               <button class="secondary-button" type="button" data-route="links">进入</button>
             </article>
-            <article class="tool-card muted">
+            <article class="tool-card muted tone-soon">
               <div class="tool-card-head">
                 <span class="tool-token">C</span>
                 <span class="status-pill muted">预留</span>
