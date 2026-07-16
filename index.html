@@ -22,6 +22,7 @@
           <button class="nav-item" type="button" data-route="expenses">每日花销</button>
           <button class="nav-item" type="button" data-route="notes">随手便签</button>
           <button class="nav-item" type="button" data-route="links">快捷入口</button>
+          <button class="nav-item" type="button" data-route="settings">云同步</button>
         </nav>
       </aside>
 
@@ -98,7 +99,7 @@
             <div>
               <p class="eyebrow">DAILY EXPENSES</p>
               <h1 id="expenseTitle">每日花销</h1>
-              <p class="subtitle">轻量本地记账，数据只保存在当前浏览器。</p>
+              <p class="subtitle">轻量记账，可保存在当前浏览器，也可以同步到你的云服务器。</p>
             </div>
             <button class="secondary-button" id="exportButton" type="button">导出数据</button>
           </header>
@@ -212,6 +213,32 @@
               <strong>打开便签</strong>
               <span>浏览器本地保存</span>
             </a>
+          </section>
+        </section>
+
+        <section class="view" id="view-settings" aria-labelledby="settingsTitle">
+          <header class="section-head">
+            <div>
+              <p class="eyebrow">CLOUD SYNC</p>
+              <h1 id="settingsTitle">云同步</h1>
+              <p class="subtitle">配置你的服务器 API 后，记账和便签会保存到云端 SQLite，换设备也能读取。</p>
+            </div>
+          </header>
+          <section class="panel settings-panel">
+            <label>
+              API 地址
+              <input id="apiBase" name="apiBase" placeholder="https://docs.getnexa.asia/toolkit-api" />
+            </label>
+            <label>
+              访问令牌
+              <input id="apiToken" name="apiToken" type="password" placeholder="粘贴服务器访问令牌" />
+            </label>
+            <div class="settings-actions">
+              <button class="primary-button" id="saveSyncButton" type="button">保存配置</button>
+              <button class="secondary-button" id="testSyncButton" type="button">测试连接</button>
+              <button class="secondary-button" id="uploadLocalButton" type="button">上传本地数据</button>
+            </div>
+            <p class="sync-status" id="syncStatus">当前使用本地浏览器保存。</p>
           </section>
         </section>
       </main>

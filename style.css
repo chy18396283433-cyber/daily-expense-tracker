@@ -230,3 +230,13 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   .record-item { grid-template-columns: 36px 1fr 28px; }
   .record-right { grid-column: 2 / 3; text-align: left; }
 }
+
+
+.settings-panel { max-width: 760px; }
+.settings-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 10px 0 14px; }
+.sync-status { margin: 0; color: var(--muted); line-height: 1.6; }
+.sync-status.error { color: var(--danger); }
+
+@media (max-width: 720px) {
+  .settings-actions { grid-template-columns: 1fr; }
+}
