@@ -55,9 +55,9 @@
               <span>记账、便签、快捷入口</span>
             </article>
             <article class="stat-card">
-              <p>本月花销</p>
-              <strong id="homeMonthTotal">¥0.00</strong>
-              <span id="homeMonthCount">0 笔支出</span>
+              <p>本期花销</p>
+              <strong id="homeCycleTotal">¥0.00</strong>
+              <span id="homeCycleCount">0 笔支出</span>
             </article>
             <article class="stat-card">
               <p>便签状态</p>
@@ -122,12 +122,12 @@
               <span id="todayCount">今天还没有记录</span>
             </article>
             <article class="stat-card">
-              <p>本月累计</p>
-              <strong id="monthTotal">¥0.00</strong>
-              <span id="monthCount">0 笔支出</span>
+              <p>本期累计</p>
+              <strong id="cycleTotal">¥0.00</strong>
+              <span id="cycleCount">0 笔支出</span>
             </article>
             <article class="stat-card">
-              <p>本月最多</p>
+              <p>本期最多</p>
               <strong id="topCategory">暂无</strong>
               <span id="topCategoryAmount">添加记录后显示</span>
             </article>
@@ -243,6 +243,10 @@
             <label>
               访问令牌
               <input id="apiToken" name="apiToken" type="password" placeholder="粘贴服务器访问令牌" />
+            </label>
+            <label>
+              每月发薪日
+              <input id="payday" name="payday" type="number" min="1" max="31" placeholder="例如 15" />
             </label>
             <div class="settings-actions">
               <button class="primary-button" id="saveSyncButton" type="button">保存配置</button>

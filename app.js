@@ -16,6 +16,7 @@ const quickNote = document.querySelector("#quickNote");
 const noteCount = document.querySelector("#noteCount");
 const apiBaseInput = document.querySelector("#apiBase");
 const apiTokenInput = document.querySelector("#apiToken");
+const paydayInput = document.querySelector("#payday");
 const syncStatus = document.querySelector("#syncStatus");
 
 const today = new Date();
@@ -29,6 +30,7 @@ let noteTimer = null;
 quickNote.value = localStorage.getItem(NOTE_STORAGE_KEY) || "";
 apiBaseInput.value = syncConfig.apiBase || DEFAULT_API_BASE;
 apiTokenInput.value = syncConfig.token || "";
+paydayInput.value = syncConfig.payday || 15;
 
 const money = (value) => new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(value);
 const formatDate = (date) => new Intl.DateTimeFormat("zh-CN", { month: "short", day: "numeric", weekday: "short" }).format(new Date(`${date}T12:00:00`));
@@ -39,9 +41,12 @@ function saveExpenses() {
 }
 
 function saveSyncConfig() {
+  const payday = Math.min(31, Math.max(1, Number(paydayInput.value) || 15));
+  paydayInput.value = payday;
   syncConfig = {
     apiBase: apiBaseInput.value.trim().replace(/\/+$/, "") || DEFAULT_API_BASE,
     token: apiTokenInput.value.trim(),
+    payday,
   };
   localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(syncConfig));
 }
@@ -107,34 +112,61 @@ async function saveCloudNoteSoon() {
   }, 450);
 }
 
-function currentMonthStats() {
-  const todayKey = new Date().toISOString().slice(0, 10);
-  const monthKey = todayKey.slice(0, 7);
-  const monthRecords = records.filter((item) => item.date.startsWith(monthKey));
-  const total = monthRecords.reduce((sum, item) => sum + item.amount, 0);
-  return { total, count: monthRecords.length };
+function dateKey(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function daysInMonth(year, monthIndex) {
+  return new Date(year, monthIndex + 1, 0).getDate();
+}
+
+function makeCycleDate(year, monthIndex, payday) {
+  return new Date(year, monthIndex, Math.min(payday, daysInMonth(year, monthIndex)), 12);
+}
+
+function addMonths(date, count) {
+  return new Date(date.getFullYear(), date.getMonth() + count, 1, 12);
+}
+
+function currentPayCycle() {
+  const payday = Math.min(31, Math.max(1, Number(syncConfig.payday) || 15));
+  const now = new Date();
+  const thisCycleStart = makeCycleDate(now.getFullYear(), now.getMonth(), payday);
+  const start = now >= thisCycleStart
+    ? thisCycleStart
+    : makeCycleDate(addMonths(now, -1).getFullYear(), addMonths(now, -1).getMonth(), payday);
+  const nextMonth = addMonths(start, 1);
+  const nextStart = makeCycleDate(nextMonth.getFullYear(), nextMonth.getMonth(), payday);
+  const displayEnd = new Date(nextStart);
+  displayEnd.setDate(displayEnd.getDate() - 1);
+  return { start: dateKey(start), end: dateKey(nextStart), displayEnd: dateKey(displayEnd), payday };
+}
+
+function currentCycleStats() {
+  const cycle = currentPayCycle();
+  const cycleRecords = records.filter((item) => item.date >= cycle.start && item.date < cycle.end);
+  const total = cycleRecords.reduce((sum, item) => sum + item.amount, 0);
+  return { ...cycle, records: cycleRecords, total, count: cycleRecords.length };
 }
 
 function renderSummary() {
-  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayKey = dateKey(new Date());
   const todayRecords = records.filter((item) => item.date === todayKey);
-  const month = currentMonthStats();
+  const cycle = currentCycleStats();
   const sum = (items) => items.reduce((total, item) => total + item.amount, 0);
 
   setText("#todayTotal", money(sum(todayRecords)));
   setText("#todayCount", todayRecords.length ? `共 ${todayRecords.length} 笔支出` : "今天还没有记录");
-  setText("#monthTotal", money(month.total));
-  setText("#monthCount", `${month.count} 笔支出`);
-  setText("#homeMonthTotal", money(month.total));
-  setText("#homeMonthCount", `${month.count} 笔支出`);
+  setText("#cycleTotal", money(cycle.total));
+  setText("#cycleCount", `${cycle.count} 笔支出 · ${cycle.start} 至 ${cycle.displayEnd}`);
+  setText("#homeCycleTotal", money(cycle.total));
+  setText("#homeCycleCount", `${cycle.count} 笔 · 发薪日 ${cycle.payday} 号`);
 
-  const monthKey = todayKey.slice(0, 7);
-  const monthRecords = records.filter((item) => item.date.startsWith(monthKey));
-  const categories = monthRecords.reduce((map, item) => ({ ...map, [item.category]: (map[item.category] || 0) + item.amount }), {});
+  const categories = cycle.records.reduce((map, item) => ({ ...map, [item.category]: (map[item.category] || 0) + item.amount }), {});
   const top = Object.entries(categories).sort((a, b) => b[1] - a[1])[0];
 
   setText("#topCategory", top ? top[0] : "暂无");
-  setText("#topCategoryAmount", top ? money(top[1]) : "添加记录后显示");
+  setText("#topCategoryAmount", top ? money(top[1]) : "本期添加记录后显示");
 }
 
 function renderExpenses() {
@@ -290,6 +322,7 @@ document.querySelector("#clearNoteButton").addEventListener("click", async () =>
 
 document.querySelector("#saveSyncButton").addEventListener("click", async () => {
   saveSyncConfig();
+  renderAll();
   await loadCloudData();
 });
 
@@ -320,3 +353,9 @@ document.querySelector("#uploadLocalButton").addEventListener("click", async () 
 renderAll();
 goTo(location.hash.slice(1) || "home");
 loadCloudData();
+
+
+paydayInput.addEventListener("change", () => {
+  saveSyncConfig();
+  renderAll();
+});
