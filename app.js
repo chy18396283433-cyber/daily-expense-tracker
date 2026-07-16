@@ -18,6 +18,8 @@ const apiBaseInput = document.querySelector("#apiBase");
 const apiTokenInput = document.querySelector("#apiToken");
 const paydayInput = document.querySelector("#payday");
 const syncStatus = document.querySelector("#syncStatus");
+const cycleSelect = document.querySelector("#cycleSelect");
+const cycleRange = document.querySelector("#cycleRange");
 
 const today = new Date();
 dateInput.value = today.toISOString().slice(0, 10);
@@ -26,6 +28,7 @@ let records = JSON.parse(localStorage.getItem(EXPENSE_STORAGE_KEY) || "[]");
 let syncConfig = JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY) || "{}");
 let cloudReady = false;
 let noteTimer = null;
+let selectedCycleOffset = 0;
 
 quickNote.value = localStorage.getItem(NOTE_STORAGE_KEY) || "";
 apiBaseInput.value = syncConfig.apiBase || DEFAULT_API_BASE;
@@ -128,39 +131,61 @@ function addMonths(date, count) {
   return new Date(date.getFullYear(), date.getMonth() + count, 1, 12);
 }
 
-function currentPayCycle() {
+function currentPayCycle(offset = 0) {
   const payday = Math.min(31, Math.max(1, Number(syncConfig.payday) || 15));
   const now = new Date();
   const thisCycleStart = makeCycleDate(now.getFullYear(), now.getMonth(), payday);
-  const start = now >= thisCycleStart
+  const baseStart = now >= thisCycleStart
     ? thisCycleStart
     : makeCycleDate(addMonths(now, -1).getFullYear(), addMonths(now, -1).getMonth(), payday);
+  const startMonth = addMonths(baseStart, offset);
+  const start = makeCycleDate(startMonth.getFullYear(), startMonth.getMonth(), payday);
   const nextMonth = addMonths(start, 1);
   const nextStart = makeCycleDate(nextMonth.getFullYear(), nextMonth.getMonth(), payday);
   const displayEnd = new Date(nextStart);
   displayEnd.setDate(displayEnd.getDate() - 1);
-  return { start: dateKey(start), end: dateKey(nextStart), displayEnd: dateKey(displayEnd), payday };
+  return { start: dateKey(start), end: dateKey(nextStart), displayEnd: dateKey(displayEnd), payday, offset };
 }
 
-function currentCycleStats() {
-  const cycle = currentPayCycle();
+function cycleStats(offset = selectedCycleOffset) {
+  const cycle = currentPayCycle(offset);
   const cycleRecords = records.filter((item) => item.date >= cycle.start && item.date < cycle.end);
   const total = cycleRecords.reduce((sum, item) => sum + item.amount, 0);
   return { ...cycle, records: cycleRecords, total, count: cycleRecords.length };
 }
 
+function cycleLabel(offset) {
+  if (offset === 0) return "当前账期";
+  if (offset === -1) return "上个账期";
+  return `${Math.abs(offset)} 个账期前`;
+}
+
+function renderCycleOptions() {
+  const currentValue = String(selectedCycleOffset);
+  cycleSelect.innerHTML = "";
+  for (let offset = 0; offset >= -11; offset -= 1) {
+    const cycle = cycleStats(offset);
+    const option = document.createElement("option");
+    option.value = String(offset);
+    option.textContent = `${cycleLabel(offset)} · ${cycle.start} 至 ${cycle.displayEnd}`;
+    cycleSelect.append(option);
+  }
+  cycleSelect.value = currentValue;
+}
+
 function renderSummary() {
   const todayKey = dateKey(new Date());
   const todayRecords = records.filter((item) => item.date === todayKey);
-  const cycle = currentCycleStats();
+  const cycle = cycleStats();
   const sum = (items) => items.reduce((total, item) => total + item.amount, 0);
 
   setText("#todayTotal", money(sum(todayRecords)));
   setText("#todayCount", todayRecords.length ? `共 ${todayRecords.length} 笔支出` : "今天还没有记录");
   setText("#cycleTotal", money(cycle.total));
   setText("#cycleCount", `${cycle.count} 笔支出 · ${cycle.start} 至 ${cycle.displayEnd}`);
-  setText("#homeCycleTotal", money(cycle.total));
-  setText("#homeCycleCount", `${cycle.count} 笔 · 发薪日 ${cycle.payday} 号`);
+  setText("#homeCycleTotal", money(cycleStats(0).total));
+  setText("#homeCycleCount", `${cycleStats(0).count} 笔 · 发薪日 ${cycle.payday} 号`);
+  cycleRange.textContent = `${cycleLabel(cycle.offset)}：${cycle.start} 至 ${cycle.displayEnd}`;
 
   const categories = cycle.records.reduce((map, item) => ({ ...map, [item.category]: (map[item.category] || 0) + item.amount }), {});
   const top = Object.entries(categories).sort((a, b) => b[1] - a[1])[0];
@@ -171,7 +196,8 @@ function renderSummary() {
 
 function renderExpenses() {
   list.innerHTML = "";
-  const ordered = [...records].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+  const cycle = cycleStats();
+  const ordered = [...cycle.records].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
   emptyState.hidden = ordered.length !== 0;
 
   ordered.forEach((record) => {
@@ -210,6 +236,7 @@ function renderNote() {
 }
 
 function renderAll() {
+  renderCycleOptions();
   renderExpenses();
   renderSummary();
   renderNote();
@@ -354,8 +381,13 @@ renderAll();
 goTo(location.hash.slice(1) || "home");
 loadCloudData();
 
-
 paydayInput.addEventListener("change", () => {
+  selectedCycleOffset = 0;
   saveSyncConfig();
+  renderAll();
+});
+
+cycleSelect.addEventListener("change", () => {
+  selectedCycleOffset = Number(cycleSelect.value) || 0;
   renderAll();
 });
