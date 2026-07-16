@@ -18,8 +18,11 @@ const apiBaseInput = document.querySelector("#apiBase");
 const apiTokenInput = document.querySelector("#apiToken");
 const paydayInput = document.querySelector("#payday");
 const syncStatus = document.querySelector("#syncStatus");
-const cycleSelect = document.querySelector("#cycleSelect");
+const cycleTitle = document.querySelector("#cycleTitle");
 const cycleRange = document.querySelector("#cycleRange");
+const previousCycleButton = document.querySelector("#previousCycleButton");
+const currentCycleButton = document.querySelector("#currentCycleButton");
+const nextCycleButton = document.querySelector("#nextCycleButton");
 
 const today = new Date();
 dateInput.value = today.toISOString().slice(0, 10);
@@ -160,17 +163,9 @@ function cycleLabel(offset) {
   return `${Math.abs(offset)} 个账期前`;
 }
 
-function renderCycleOptions() {
-  const currentValue = String(selectedCycleOffset);
-  cycleSelect.innerHTML = "";
-  for (let offset = 0; offset >= -11; offset -= 1) {
-    const cycle = cycleStats(offset);
-    const option = document.createElement("option");
-    option.value = String(offset);
-    option.textContent = `${cycleLabel(offset)} · ${cycle.start} 至 ${cycle.displayEnd}`;
-    cycleSelect.append(option);
-  }
-  cycleSelect.value = currentValue;
+function renderCycleControls() {
+  nextCycleButton.disabled = selectedCycleOffset >= 0;
+  previousCycleButton.disabled = selectedCycleOffset <= -24;
 }
 
 function renderSummary() {
@@ -185,7 +180,8 @@ function renderSummary() {
   setText("#cycleCount", `${cycle.count} 笔支出 · ${cycle.start} 至 ${cycle.displayEnd}`);
   setText("#homeCycleTotal", money(cycleStats(0).total));
   setText("#homeCycleCount", `${cycleStats(0).count} 笔 · 发薪日 ${cycle.payday} 号`);
-  cycleRange.textContent = `${cycleLabel(cycle.offset)}：${cycle.start} 至 ${cycle.displayEnd}`;
+  cycleTitle.textContent = cycleLabel(cycle.offset);
+  cycleRange.textContent = `${cycle.start} 至 ${cycle.displayEnd}`;
 
   const categories = cycle.records.reduce((map, item) => ({ ...map, [item.category]: (map[item.category] || 0) + item.amount }), {});
   const top = Object.entries(categories).sort((a, b) => b[1] - a[1])[0];
@@ -236,7 +232,7 @@ function renderNote() {
 }
 
 function renderAll() {
-  renderCycleOptions();
+  renderCycleControls();
   renderExpenses();
   renderSummary();
   renderNote();
@@ -387,7 +383,17 @@ paydayInput.addEventListener("change", () => {
   renderAll();
 });
 
-cycleSelect.addEventListener("change", () => {
-  selectedCycleOffset = Number(cycleSelect.value) || 0;
+previousCycleButton.addEventListener("click", () => {
+  selectedCycleOffset -= 1;
+  renderAll();
+});
+
+currentCycleButton.addEventListener("click", () => {
+  selectedCycleOffset = 0;
+  renderAll();
+});
+
+nextCycleButton.addEventListener("click", () => {
+  selectedCycleOffset = Math.min(0, selectedCycleOffset + 1);
   renderAll();
 });

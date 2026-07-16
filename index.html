@@ -134,11 +134,16 @@
           </section>
 
           <section class="cycle-toolbar panel" aria-label="账期筛选">
-            <label>
-              查看账期
-              <select id="cycleSelect" name="cycleSelect"></select>
-            </label>
-            <span id="cycleRange" class="cycle-range">当前账期</span>
+            <div>
+              <p class="eyebrow">PAY CYCLE</p>
+              <h2 id="cycleTitle">当前账期</h2>
+              <span id="cycleRange" class="cycle-range">发薪周期</span>
+            </div>
+            <div class="cycle-actions" role="group" aria-label="切换账期">
+              <button class="secondary-button cycle-button" id="previousCycleButton" type="button">上一期</button>
+              <button class="secondary-button cycle-button" id="currentCycleButton" type="button">当前</button>
+              <button class="secondary-button cycle-button" id="nextCycleButton" type="button">下一期</button>
+            </div>
           </section>
 
           <section class="content-grid">

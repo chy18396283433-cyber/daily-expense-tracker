@@ -276,14 +276,17 @@ h2 { margin-bottom: 0; font-size: 20px; letter-spacing: 0; }
 
 .cycle-toolbar {
   display: grid;
-  grid-template-columns: minmax(240px, 360px) 1fr;
+  grid-template-columns: minmax(220px, 1fr) auto;
   gap: 16px;
-  align-items: end;
+  align-items: center;
   margin-bottom: 18px;
 }
 
-.cycle-toolbar label { margin-bottom: 0; }
-.cycle-range { display: block; padding: 13px 14px; color: var(--muted); border-radius: 8px; background: rgba(242, 246, 248, .9); font-size: 14px; }
+.cycle-toolbar h2 { margin-bottom: 8px; }
+.cycle-range { display: inline-flex; min-height: 34px; align-items: center; padding: 7px 11px; color: var(--muted); border-radius: 8px; background: rgba(242, 246, 248, .9); font-size: 14px; }
+.cycle-actions { display: flex; gap: 10px; align-items: center; }
+.cycle-button { min-width: 86px; }
+.cycle-button:disabled { cursor: not-allowed; opacity: .45; transform: none; box-shadow: none; }
 
 .content-grid { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 18px; align-items: start; }
 .panel { padding: 24px; }
