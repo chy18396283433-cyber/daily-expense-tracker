@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#14532d" />
     <title>个人工具箱</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20260716-cyclebar" />
   </head>
   <body>
     <div class="site-shell">
@@ -133,16 +133,16 @@
             </article>
           </section>
 
-          <section class="cycle-toolbar panel" aria-label="账期筛选">
-            <div>
-              <p class="eyebrow">PAY CYCLE</p>
-              <h2 id="cycleTitle">当前账期</h2>
+          <section class="cycle-toolbar" aria-label="账期筛选">
+            <div class="cycle-info">
+              <span class="cycle-kicker">账期</span>
+              <strong id="cycleTitle">当前账期</strong>
               <span id="cycleRange" class="cycle-range">发薪周期</span>
             </div>
             <div class="cycle-actions" role="group" aria-label="切换账期">
-              <button class="secondary-button cycle-button" id="previousCycleButton" type="button">上一期</button>
-              <button class="secondary-button cycle-button" id="currentCycleButton" type="button">当前</button>
-              <button class="secondary-button cycle-button" id="nextCycleButton" type="button">下一期</button>
+              <button class="cycle-button" id="previousCycleButton" type="button">上一期</button>
+              <button class="cycle-button current" id="currentCycleButton" type="button">当前</button>
+              <button class="cycle-button" id="nextCycleButton" type="button">下一期</button>
             </div>
           </section>
 
@@ -286,6 +286,6 @@
         <button class="delete-button" type="button" aria-label="删除这笔记录">×</button>
       </article>
     </template>
-    <script src="app.js"></script>
+    <script src="app.js?v=20260716-cyclebar"></script>
   </body>
 </html>
