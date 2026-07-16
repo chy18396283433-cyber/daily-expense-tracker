@@ -23,6 +23,10 @@ const cycleRange = document.querySelector("#cycleRange");
 const previousCycleButton = document.querySelector("#previousCycleButton");
 const currentCycleButton = document.querySelector("#currentCycleButton");
 const nextCycleButton = document.querySelector("#nextCycleButton");
+const recordSearch = document.querySelector("#recordSearch");
+const recordCategoryFilter = document.querySelector("#recordCategoryFilter");
+const recordCount = document.querySelector("#recordCount");
+const loadMoreRecordsButton = document.querySelector("#loadMoreRecordsButton");
 const formModeLabel = document.querySelector("#formModeLabel");
 const formTitle = document.querySelector("#formTitle");
 const submitExpenseButton = document.querySelector("#submitExpenseButton");
@@ -37,6 +41,7 @@ let cloudReady = false;
 let noteTimer = null;
 let selectedCycleOffset = 0;
 let editingRecordId = null;
+let visibleRecordLimit = 10;
 
 quickNote.value = localStorage.getItem(NOTE_STORAGE_KEY) || "";
 apiBaseInput.value = syncConfig.apiBase || DEFAULT_API_BASE;
@@ -218,13 +223,27 @@ function renderSummary() {
   setText("#topCategoryAmount", top ? money(top[1]) : "本期添加记录后显示");
 }
 
+function filteredCycleRecords() {
+  const cycle = cycleStats();
+  const keyword = recordSearch.value.trim().toLowerCase();
+  const category = recordCategoryFilter.value;
+  return cycle.records.filter((record) => {
+    const matchesCategory = !category || record.category === category;
+    const text = `${record.category} ${record.note || ""} ${record.date}`.toLowerCase();
+    return matchesCategory && (!keyword || text.includes(keyword));
+  });
+}
+
 function renderExpenses() {
   list.innerHTML = "";
-  const cycle = cycleStats();
-  const ordered = [...cycle.records].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+  const ordered = filteredCycleRecords().sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+  const visible = ordered.slice(0, visibleRecordLimit);
+  recordCount.textContent = `${ordered.length} 条`;
   emptyState.hidden = ordered.length !== 0;
+  loadMoreRecordsButton.hidden = ordered.length <= visibleRecordLimit;
+  loadMoreRecordsButton.textContent = `加载更多（还剩 ${Math.max(0, ordered.length - visibleRecordLimit)} 条）`;
 
-  ordered.forEach((record) => {
+  visible.forEach((record) => {
     const node = template.content.cloneNode(true);
     const categoryLabel = { 餐饮: "食", 交通: "行", 购物: "购", 娱乐: "乐", 居住: "住", 其他: "其" }[record.category] || "其";
 
@@ -415,23 +434,42 @@ loadCloudData();
 
 paydayInput.addEventListener("change", () => {
   selectedCycleOffset = 0;
+  visibleRecordLimit = 10;
   saveSyncConfig();
   renderAll();
 });
 
 cancelEditButton.addEventListener("click", resetExpenseForm);
 
+recordSearch.addEventListener("input", () => {
+  visibleRecordLimit = 10;
+  renderExpenses();
+});
+
+recordCategoryFilter.addEventListener("change", () => {
+  visibleRecordLimit = 10;
+  renderExpenses();
+});
+
+loadMoreRecordsButton.addEventListener("click", () => {
+  visibleRecordLimit += 10;
+  renderExpenses();
+});
+
 previousCycleButton.addEventListener("click", () => {
   selectedCycleOffset -= 1;
+  visibleRecordLimit = 10;
   renderAll();
 });
 
 currentCycleButton.addEventListener("click", () => {
   selectedCycleOffset = 0;
+  visibleRecordLimit = 10;
   renderAll();
 });
 
 nextCycleButton.addEventListener("click", () => {
   selectedCycleOffset = Math.min(0, selectedCycleOffset + 1);
+  visibleRecordLimit = 10;
   renderAll();
 });

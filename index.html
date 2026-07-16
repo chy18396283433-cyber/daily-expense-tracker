@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#14532d" />
     <title>个人工具箱</title>
-    <link rel="stylesheet" href="style.css?v=20260716-edit" />
+    <link rel="stylesheet" href="style.css?v=20260716-records" />
   </head>
   <body>
     <div class="site-shell">
@@ -189,11 +189,25 @@
                 <div>
                   <p class="eyebrow">RECENT RECORDS</p>
                   <h2>最近记录</h2>
+                  <span id="recordCount" class="record-count">0 条</span>
                 </div>
                 <button class="text-button danger" id="clearButton" type="button">清空全部</button>
               </div>
+              <div class="record-filters" aria-label="记录筛选">
+                <input id="recordSearch" type="search" placeholder="搜索备注或分类" />
+                <select id="recordCategoryFilter" aria-label="按分类筛选">
+                  <option value="">全部分类</option>
+                  <option value="餐饮">餐饮</option>
+                  <option value="交通">交通</option>
+                  <option value="购物">购物</option>
+                  <option value="娱乐">娱乐</option>
+                  <option value="居住">居住</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
               <div id="recordList" class="record-list"></div>
               <p id="emptyState" class="empty-state">这个账期还没有花销记录。</p>
+              <button class="secondary-button load-more-button" id="loadMoreRecordsButton" type="button" hidden>加载更多</button>
             </section>
           </section>
         </section>
@@ -290,6 +304,6 @@
         </div>
       </article>
     </template>
-    <script src="app.js?v=20260716-edit"></script>
+    <script src="app.js?v=20260716-records"></script>
   </body>
 </html>
