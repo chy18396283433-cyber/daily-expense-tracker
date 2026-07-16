@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#155e75" />
+    <title>每日花销</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">DAILY EXPENSES</p>
+          <h1>每天花在哪，一眼就知道</h1>
+          <p class="subtitle">轻量本地记账，数据只保存在当前浏览器。</p>
+        </div>
+        <button class="secondary-button" id="exportButton" type="button">导出数据</button>
+      </header>
+
+      <section class="summary-grid" aria-label="花销汇总">
+        <article class="summary-card accent">
+          <p>今天花了</p>
+          <strong id="todayTotal">¥0.00</strong>
+          <span id="todayCount">今天还没有记录</span>
+        </article>
+        <article class="summary-card">
+          <p>本月累计</p>
+          <strong id="monthTotal">¥0.00</strong>
+          <span id="monthCount">0 笔支出</span>
+        </article>
+        <article class="summary-card">
+          <p>本月最多</p>
+          <strong id="topCategory">暂无</strong>
+          <span id="topCategoryAmount">添加记录后显示</span>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <form class="expense-form panel" id="expenseForm">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">NEW RECORD</p>
+              <h2>记一笔</h2>
+            </div>
+          </div>
+          <label>
+            金额
+            <div class="amount-input">
+              <span>¥</span>
+              <input id="amount" name="amount" inputmode="decimal" placeholder="例如 28.50" required />
+            </div>
+          </label>
+          <label>
+            分类
+            <select id="category" name="category">
+              <option value="餐饮">餐饮</option>
+              <option value="交通">交通</option>
+              <option value="购物">购物</option>
+              <option value="娱乐">娱乐</option>
+              <option value="居住">居住</option>
+              <option value="其他">其他</option>
+            </select>
+          </label>
+          <label>
+            日期
+            <input id="date" name="date" type="date" required />
+          </label>
+          <label>
+            备注 <span class="optional">可选</span>
+            <input id="note" name="note" maxlength="50" placeholder="例如：午饭、地铁、咖啡" />
+          </label>
+          <button class="primary-button" type="submit">保存这笔花销</button>
+        </form>
+
+        <section class="records panel">
+          <div class="panel-heading records-heading">
+            <div>
+              <p class="eyebrow">RECENT RECORDS</p>
+              <h2>最近记录</h2>
+            </div>
+            <button class="text-button" id="clearButton" type="button">清空全部</button>
+          </div>
+          <div id="recordList" class="record-list"></div>
+          <p id="emptyState" class="empty-state">还没有花销记录，先从第一笔开始吧。</p>
+        </section>
+      </section>
+    </main>
+    <template id="recordTemplate">
+      <article class="record-item">
+        <div class="category-icon"></div>
+        <div class="record-info">
+          <strong class="record-category"></strong>
+          <span class="record-note"></span>
+        </div>
+        <div class="record-right">
+          <strong class="record-amount"></strong>
+          <span class="record-date"></span>
+        </div>
+        <button class="delete-button" type="button" aria-label="删除这笔记录">×</button>
+      </article>
+    </template>
+    <script src="app.js"></script>
+  </body>
+</html>
