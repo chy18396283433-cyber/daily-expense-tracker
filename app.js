@@ -3,7 +3,7 @@ const NOTE_STORAGE_KEY = "personal-toolkit-quick-note";
 const SYNC_CONFIG_KEY = "personal-toolkit-sync-config";
 const DEFAULT_API_BASE = "https://docs.getnexa.asia/toolkit-api";
 
-const routes = ["home", "expenses", "notes", "links", "settings"];
+const routes = ["home", "expenses", "notes", "dates", "text", "links", "settings"];
 const navItems = document.querySelectorAll("[data-route]");
 const views = Object.fromEntries(routes.map((route) => [route, document.querySelector(`#view-${route}`)]));
 
@@ -31,9 +31,21 @@ const formModeLabel = document.querySelector("#formModeLabel");
 const formTitle = document.querySelector("#formTitle");
 const submitExpenseButton = document.querySelector("#submitExpenseButton");
 const cancelEditButton = document.querySelector("#cancelEditButton");
+const dateStartInput = document.querySelector("#dateStart");
+const dateEndInput = document.querySelector("#dateEnd");
+const dateAddBaseInput = document.querySelector("#dateAddBase");
+const dateAddDaysInput = document.querySelector("#dateAddDays");
+const dateDiffResult = document.querySelector("#dateDiffResult");
+const dateAddResult = document.querySelector("#dateAddResult");
+const textInput = document.querySelector("#textInput");
+const textStats = document.querySelector("#textStats");
 
 const today = new Date();
-dateInput.value = today.toISOString().slice(0, 10);
+const todayKey = today.toISOString().slice(0, 10);
+dateInput.value = todayKey;
+dateStartInput.value = todayKey;
+dateEndInput.value = todayKey;
+dateAddBaseInput.value = todayKey;
 
 let records = JSON.parse(localStorage.getItem(EXPENSE_STORAGE_KEY) || "[]");
 let syncConfig = JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY) || "{}");
@@ -49,7 +61,9 @@ apiTokenInput.value = syncConfig.token || "";
 paydayInput.value = syncConfig.payday || 15;
 
 const money = (value) => new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(value);
-const formatDate = (date) => new Intl.DateTimeFormat("zh-CN", { month: "short", day: "numeric", weekday: "short" }).format(new Date(`${date}T12:00:00`));
+const parseDate = (value) => new Date(`${value}T12:00:00`);
+const formatDate = (date) => new Intl.DateTimeFormat("zh-CN", { month: "short", day: "numeric", weekday: "short" }).format(parseDate(date));
+const formatFullDate = (date) => new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(date);
 const hasCloudConfig = () => Boolean(syncConfig.apiBase && syncConfig.token);
 
 function saveExpenses() {
@@ -280,11 +294,41 @@ function renderNote() {
   setText("#homeNoteState", length ? "已保存" : "空");
 }
 
+function renderDateTools() {
+  if (dateStartInput.value && dateEndInput.value) {
+    const start = parseDate(dateStartInput.value);
+    const end = parseDate(dateEndInput.value);
+    const diff = Math.round((end - start) / 86400000);
+    const direction = diff > 0 ? "后" : diff < 0 ? "前" : "";
+    dateDiffResult.textContent = `${Math.abs(diff)} 天${direction ? ` ${direction}` : ""}`;
+  } else {
+    dateDiffResult.textContent = "请选择日期";
+  }
+
+  if (dateAddBaseInput.value) {
+    const result = parseDate(dateAddBaseInput.value);
+    result.setDate(result.getDate() + (Number(dateAddDaysInput.value) || 0));
+    dateAddResult.textContent = formatFullDate(result);
+  } else {
+    dateAddResult.textContent = "请选择日期";
+  }
+}
+
+function renderTextStats() {
+  const text = textInput.value;
+  const lines = text ? text.split(/\r\n|\r|\n/).length : 0;
+  const nonSpace = text.replace(/\s/g, "").length;
+  const words = (text.match(/[A-Za-z0-9_]+|[\u4e00-\u9fa5]/g) || []).length;
+  textStats.textContent = `${text.length} 字符 · ${nonSpace} 非空白 · ${lines} 行 · ${words} 词/字`;
+}
+
 function renderAll() {
   renderCycleControls();
   renderExpenses();
   renderSummary();
   renderNote();
+  renderDateTools();
+  renderTextStats();
 }
 
 function goTo(route) {
@@ -426,6 +470,31 @@ document.querySelector("#uploadLocalButton").addEventListener("click", async () 
   } catch (error) {
     setSyncStatus(`上传失败：${error.message}`, true);
   }
+});
+
+[dateStartInput, dateEndInput, dateAddBaseInput, dateAddDaysInput].forEach((input) => {
+  input.addEventListener("input", renderDateTools);
+});
+
+textInput.addEventListener("input", renderTextStats);
+
+document.querySelector("#trimTextButton").addEventListener("click", () => {
+  textInput.value = textInput.value.split(/\r?\n/).map((line) => line.trim()).join("\n").trim();
+  renderTextStats();
+});
+
+document.querySelector("#removeBlankLinesButton").addEventListener("click", () => {
+  textInput.value = textInput.value.split(/\r?\n/).filter((line) => line.trim()).join("\n");
+  renderTextStats();
+});
+
+document.querySelector("#copyTextButton").addEventListener("click", async () => {
+  await navigator.clipboard.writeText(textInput.value);
+});
+
+document.querySelector("#clearTextButton").addEventListener("click", () => {
+  textInput.value = "";
+  renderTextStats();
 });
 
 renderAll();

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#14532d" />
     <title>个人工具箱</title>
-    <link rel="stylesheet" href="style.css?v=20260716-records" />
+    <link rel="stylesheet" href="style.css?v=20260717-tools" />
   </head>
   <body>
     <div class="site-shell">
@@ -21,6 +21,8 @@
           <button class="nav-item active" type="button" data-route="home">总览</button>
           <button class="nav-item" type="button" data-route="expenses">每日花销</button>
           <button class="nav-item" type="button" data-route="notes">随手便签</button>
+          <button class="nav-item" type="button" data-route="dates">日期计算</button>
+          <button class="nav-item" type="button" data-route="text">文本处理</button>
           <button class="nav-item" type="button" data-route="links">快捷入口</button>
           <button class="nav-item" type="button" data-route="settings">云同步</button>
         </nav>
@@ -32,7 +34,7 @@
             <div>
               <p class="eyebrow">PRIVATE TOOLKIT</p>
               <h1 id="homeTitle">把常用小工具收进一个地方</h1>
-              <p class="subtitle">个人使用的轻量网站，先放记账、便签和快捷入口，后面可以继续加计算器、清单、换算器、查询页。</p>
+              <p class="subtitle">个人使用的轻量网站，先放记账、便签、日期计算、文本处理和快捷入口，后面可以继续加清单、换算器、查询页。</p>
             </div>
             <aside class="hero-widget" aria-label="工具箱状态">
               <div class="sync-badge">云同步已接入</div>
@@ -42,8 +44,8 @@
               </div>
               <div class="hero-widget-grid">
                 <button class="hero-mini-button" type="button" data-route="expenses">记账</button>
-                <button class="hero-mini-button" type="button" data-route="notes">便签</button>
-                <button class="hero-mini-button" type="button" data-route="settings">同步</button>
+                <button class="hero-mini-button" type="button" data-route="dates">算天数</button>
+                <button class="hero-mini-button" type="button" data-route="text">处理文本</button>
               </div>
             </aside>
           </header>
@@ -51,8 +53,8 @@
           <section class="stats-grid" aria-label="工具箱状态">
             <article class="stat-card accent">
               <p>已可用工具</p>
-              <strong>3</strong>
-              <span>记账、便签、快捷入口</span>
+              <strong>5</strong>
+              <span>记账、便签、日期、文本、入口</span>
             </article>
             <article class="stat-card">
               <p>本期花销</p>
@@ -73,7 +75,7 @@
                 <span class="status-pill">可用</span>
               </div>
               <h2>每日花销</h2>
-              <p>记录支出、查看今日和本月统计，数据只保存在本机浏览器。</p>
+              <p>记录支出、查看今日和本月统计，支持发薪周期、编辑记录和云端同步。</p>
               <button class="secondary-button" type="button" data-route="expenses">进入</button>
             </article>
             <article class="tool-card ready tone-note">
@@ -85,6 +87,24 @@
               <p>存临时想法、待办片段、常用文字，刷新页面也会保留。</p>
               <button class="secondary-button" type="button" data-route="notes">进入</button>
             </article>
+            <article class="tool-card ready tone-date">
+              <div class="tool-card-head">
+                <span class="tool-token">D</span>
+                <span class="status-pill">可用</span>
+              </div>
+              <h2>日期计算</h2>
+              <p>算两个日期差几天，也能从某天开始往前或往后推日期。</p>
+              <button class="secondary-button" type="button" data-route="dates">进入</button>
+            </article>
+            <article class="tool-card ready tone-text">
+              <div class="tool-card-head">
+                <span class="tool-token">T</span>
+                <span class="status-pill">可用</span>
+              </div>
+              <h2>文本处理</h2>
+              <p>统计字数行数，顺手清理空行、首尾空格，再复制结果。</p>
+              <button class="secondary-button" type="button" data-route="text">进入</button>
+            </article>
             <article class="tool-card ready tone-link">
               <div class="tool-card-head">
                 <span class="tool-token">L</span>
@@ -93,14 +113,6 @@
               <h2>快捷入口</h2>
               <p>把常开的本地服务、文档和网页放在同一个面板里。</p>
               <button class="secondary-button" type="button" data-route="links">进入</button>
-            </article>
-            <article class="tool-card muted tone-soon">
-              <div class="tool-card-head">
-                <span class="tool-token">C</span>
-                <span class="status-pill muted">预留</span>
-              </div>
-              <h2>换算器</h2>
-              <p>以后可以加汇率、单位、日期差、百分比等常用计算。</p>
             </article>
           </section>
         </section>
@@ -231,6 +243,82 @@
           </section>
         </section>
 
+        <section class="view" id="view-dates" aria-labelledby="datesTitle">
+          <header class="section-head">
+            <div>
+              <p class="eyebrow">DATE TOOLS</p>
+              <h1 id="datesTitle">日期计算</h1>
+              <p class="subtitle">算日期间隔，或者从某一天开始向前、向后推算。</p>
+            </div>
+          </header>
+          <section class="utility-grid">
+            <article class="panel utility-panel">
+              <div class="panel-heading compact">
+                <div>
+                  <p class="eyebrow">DIFFERENCE</p>
+                  <h2>日期间隔</h2>
+                </div>
+              </div>
+              <label>
+                开始日期
+                <input id="dateStart" type="date" />
+              </label>
+              <label>
+                结束日期
+                <input id="dateEnd" type="date" />
+              </label>
+              <div class="result-card">
+                <span>相差</span>
+                <strong id="dateDiffResult">0 天</strong>
+              </div>
+            </article>
+            <article class="panel utility-panel">
+              <div class="panel-heading compact">
+                <div>
+                  <p class="eyebrow">ADD DAYS</p>
+                  <h2>推算日期</h2>
+                </div>
+              </div>
+              <label>
+                基准日期
+                <input id="dateAddBase" type="date" />
+              </label>
+              <label>
+                增减天数
+                <input id="dateAddDays" type="number" step="1" value="30" placeholder="例如 30 或 -7" />
+              </label>
+              <div class="result-card">
+                <span>结果日期</span>
+                <strong id="dateAddResult">-</strong>
+              </div>
+            </article>
+          </section>
+        </section>
+
+        <section class="view" id="view-text" aria-labelledby="textTitle">
+          <header class="section-head">
+            <div>
+              <p class="eyebrow">TEXT TOOLS</p>
+              <h1 id="textTitle">文本处理</h1>
+              <p class="subtitle">临时统计字数、清理空行和空格，处理完可以直接复制。</p>
+            </div>
+          </header>
+          <section class="panel text-tool">
+            <label for="textInput">文本内容</label>
+            <textarea id="textInput" rows="12" placeholder="把要处理的文本放在这里..."></textarea>
+            <div class="tool-actions">
+              <button class="secondary-button" id="trimTextButton" type="button">整理空格</button>
+              <button class="secondary-button" id="removeBlankLinesButton" type="button">删除空行</button>
+              <button class="secondary-button" id="copyTextButton" type="button">复制结果</button>
+              <button class="text-button danger" id="clearTextButton" type="button">清空</button>
+            </div>
+            <div class="result-card inline-result">
+              <span>统计</span>
+              <strong id="textStats">0 字符 · 0 行</strong>
+            </div>
+          </section>
+        </section>
+
         <section class="view" id="view-links" aria-labelledby="linksTitle">
           <header class="section-head">
             <div>
@@ -304,6 +392,6 @@
         </div>
       </article>
     </template>
-    <script src="app.js?v=20260716-records"></script>
+    <script src="app.js?v=20260717-tools"></script>
   </body>
 </html>
