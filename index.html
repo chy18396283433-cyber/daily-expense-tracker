@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#14532d" />
     <title>个人工具箱</title>
-    <link rel="stylesheet" href="style.css?v=20260717-polish" />
+    <link rel="stylesheet" href="style.css?v=20260717-shell" />
   </head>
   <body>
     <div class="site-shell">
@@ -18,17 +18,38 @@
           </span>
         </a>
         <nav class="tool-nav">
-          <button class="nav-item active" type="button" data-route="home">总览</button>
-          <button class="nav-item" type="button" data-route="expenses">每日花销</button>
-          <button class="nav-item" type="button" data-route="notes">随手便签</button>
-          <button class="nav-item" type="button" data-route="dates">日期计算</button>
-          <button class="nav-item" type="button" data-route="text">文本处理</button>
-          <button class="nav-item" type="button" data-route="links">快捷入口</button>
-          <button class="nav-item" type="button" data-route="settings">云同步</button>
+          <div class="nav-group">
+            <span class="nav-label">工作台</span>
+            <button class="nav-item active" type="button" data-route="home"><span>总览</span></button>
+          </div>
+          <div class="nav-group">
+            <span class="nav-label">小工具</span>
+            <button class="nav-item" type="button" data-route="expenses"><span>每日花销</span></button>
+            <button class="nav-item" type="button" data-route="notes"><span>随手便签</span></button>
+            <button class="nav-item" type="button" data-route="dates"><span>日期计算</span></button>
+            <button class="nav-item" type="button" data-route="text"><span>文本处理</span></button>
+            <button class="nav-item" type="button" data-route="links"><span>快捷入口</span></button>
+          </div>
+          <div class="nav-group">
+            <span class="nav-label">系统</span>
+            <button class="nav-item" type="button" data-route="settings"><span>云同步</span></button>
+          </div>
         </nav>
       </aside>
 
-      <main class="workspace">
+      <main class="app-main">
+        <header class="app-topbar">
+          <div>
+            <p class="topbar-kicker">PERSONAL TOOLKIT</p>
+            <strong>个人工具工作台</strong>
+          </div>
+          <div class="topbar-actions" aria-label="当前状态">
+            <span>GitHub Pages</span>
+            <button class="topbar-button" type="button" data-route="settings">同步设置</button>
+          </div>
+        </header>
+
+        <div class="workspace">
         <section class="view active" id="view-home" aria-labelledby="homeTitle">
           <header class="hero">
             <div>
@@ -380,6 +401,7 @@
             <p class="sync-status" id="syncStatus">当前使用本地浏览器保存。</p>
           </section>
         </section>
+        </div>
       </main>
     </div>
 
@@ -400,6 +422,6 @@
         </div>
       </article>
     </template>
-    <script src="app.js?v=20260717-polish"></script>
+    <script src="app.js?v=20260717-shell"></script>
   </body>
 </html>
