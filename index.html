@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#14532d" />
     <title>个人工具箱</title>
-    <link rel="stylesheet" href="style.css?v=20260717-shell" />
+    <link rel="stylesheet" href="style.css?v=20260724-analysis" />
   </head>
   <body>
     <div class="site-shell">
@@ -184,6 +184,48 @@
               <button class="cycle-button" id="previousCycleButton" type="button">上一期</button>
               <button class="cycle-button current" id="currentCycleButton" type="button">当前</button>
               <button class="cycle-button" id="nextCycleButton" type="button">下一期</button>
+            </div>
+          </section>
+
+          <section class="expense-analysis panel" aria-labelledby="analysisTitle">
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">ANALYSIS</p>
+                <h2 id="analysisTitle">本期分析</h2>
+              </div>
+              <span class="analysis-note" id="analysisRange">按当前账期统计</span>
+            </div>
+            <div class="analysis-metrics" aria-label="账期分析指标">
+              <article class="analysis-metric">
+                <span>日均支出</span>
+                <strong id="analysisDailyAverage">¥0.00</strong>
+              </article>
+              <article class="analysis-metric">
+                <span>最高单笔</span>
+                <strong id="analysisLargest">¥0.00</strong>
+              </article>
+              <article class="analysis-metric">
+                <span>有支出天数</span>
+                <strong id="analysisActiveDays">0 天</strong>
+              </article>
+              <article class="analysis-metric">
+                <span>预计本期</span>
+                <strong id="analysisProjection">¥0.00</strong>
+              </article>
+            </div>
+            <div class="analysis-layout">
+              <section class="analysis-block" aria-labelledby="categoryAnalysisTitle">
+                <h3 id="categoryAnalysisTitle">分类占比</h3>
+                <div id="categoryAnalysisList" class="analysis-list"></div>
+              </section>
+              <section class="analysis-block" aria-labelledby="weeklyAnalysisTitle">
+                <h3 id="weeklyAnalysisTitle">7 天趋势</h3>
+                <div id="weeklyAnalysisList" class="weekly-bars"></div>
+              </section>
+              <section class="analysis-block insight-block" aria-labelledby="analysisInsightTitle">
+                <h3 id="analysisInsightTitle">简短结论</h3>
+                <p id="analysisInsight">添加记录后显示本期花销结构。</p>
+              </section>
             </div>
           </section>
 
@@ -422,6 +464,6 @@
         </div>
       </article>
     </template>
-    <script src="app.js?v=20260717-shell"></script>
+    <script src="app.js?v=20260724-analysis"></script>
   </body>
 </html>

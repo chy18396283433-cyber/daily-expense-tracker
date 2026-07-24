@@ -370,6 +370,30 @@ h2 { margin-bottom: 0; font-size: 20px; letter-spacing: 0; }
 .cycle-button:hover:not(:disabled) { border-color: #7fc2b1; transform: translateY(-1px); }
 .cycle-button:disabled { cursor: not-allowed; opacity: .42; transform: none; box-shadow: none; }
 
+.expense-analysis { margin-bottom: 18px; }
+.analysis-note { color: var(--muted); font-size: 13px; }
+.analysis-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+.analysis-metric { padding: 14px; border: 1px solid rgba(216, 224, 234, .78); border-radius: 8px; background: rgba(248, 250, 252, .72); }
+.analysis-metric span { display: block; margin-bottom: 8px; color: var(--muted); font-size: 12px; font-weight: 760; }
+.analysis-metric strong { display: block; font-size: 22px; line-height: 1.15; }
+.analysis-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(220px, .8fr); gap: 14px; align-items: stretch; }
+.analysis-block { padding: 16px; border: 1px solid rgba(216, 224, 234, .78); border-radius: 8px; background: rgba(255, 255, 255, .68); }
+.analysis-block h3 { margin: 0 0 14px; font-size: 15px; }
+.analysis-list { display: grid; gap: 12px; }
+.analysis-row-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 7px; font-size: 13px; }
+.analysis-row-head span { color: var(--muted); white-space: nowrap; }
+.analysis-bar { height: 8px; overflow: hidden; border-radius: 999px; background: #edf2f5; }
+.analysis-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #0f766e, #14b8a6); }
+.analysis-empty { margin: 0; color: var(--muted); line-height: 1.7; }
+.weekly-bars { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; min-height: 150px; align-items: end; }
+.weekly-bar-item { display: grid; grid-template-rows: auto 96px auto; gap: 7px; min-width: 0; text-align: center; }
+.weekly-amount { min-height: 18px; color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.weekly-track { display: flex; height: 96px; align-items: end; justify-content: center; border-radius: 8px; background: #edf2f5; overflow: hidden; }
+.weekly-track span { width: 100%; border-radius: 8px 8px 0 0; background: linear-gradient(180deg, #14b8a6, #0f766e); }
+.weekly-label { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.insight-block { background: linear-gradient(135deg, rgba(221, 247, 239, .86), rgba(255, 255, 255, .76)); }
+.insight-block p { margin: 0; color: #344054; line-height: 1.75; }
+
 .content-grid { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 18px; align-items: start; }
 .panel { padding: 24px; }
 .panel-heading { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 22px; }
@@ -458,7 +482,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   .app-topbar { position: static; min-height: auto; padding: 14px; align-items: flex-start; flex-direction: column; }
   .topbar-actions { width: 100%; justify-content: space-between; }
   .workspace { width: min(100% - 28px, 1120px); padding-top: 24px; }
-  .hero, .section-head, .content-grid { grid-template-columns: 1fr; }
+  .hero, .section-head, .content-grid, .analysis-layout { grid-template-columns: 1fr; }
   .cycle-toolbar { align-items: stretch; flex-direction: column; }
   .cycle-info { align-items: flex-start; flex-direction: column; gap: 6px; }
   .hero-widget { width: 100%; }
@@ -466,6 +490,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   .hero { min-height: auto; padding: 24px; }
   h1 { font-size: 31px; }
   .hero-action, .section-head .secondary-button { width: 100%; }
+  .analysis-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .settings-actions { grid-template-columns: 1fr; }
 }
 
@@ -474,6 +499,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   .brand { margin-bottom: 12px; }
   .topbar-actions { align-items: stretch; flex-direction: column; }
   .panel, .stat-card, .tool-card { padding: 18px; }
+  .analysis-metrics { grid-template-columns: 1fr; }
+  .weekly-bars { gap: 5px; }
   .record-filters { grid-template-columns: 1fr; }
   .record-item { grid-template-columns: 36px 1fr; }
   .record-right, .record-actions { grid-column: 2 / 3; justify-self: start; text-align: left; }

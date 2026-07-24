@@ -39,6 +39,14 @@ const dateDiffResult = document.querySelector("#dateDiffResult");
 const dateAddResult = document.querySelector("#dateAddResult");
 const textInput = document.querySelector("#textInput");
 const textStats = document.querySelector("#textStats");
+const analysisRange = document.querySelector("#analysisRange");
+const analysisDailyAverage = document.querySelector("#analysisDailyAverage");
+const analysisLargest = document.querySelector("#analysisLargest");
+const analysisActiveDays = document.querySelector("#analysisActiveDays");
+const analysisProjection = document.querySelector("#analysisProjection");
+const categoryAnalysisList = document.querySelector("#categoryAnalysisList");
+const weeklyAnalysisList = document.querySelector("#weeklyAnalysisList");
+const analysisInsight = document.querySelector("#analysisInsight");
 
 const today = new Date();
 const todayKey = today.toISOString().slice(0, 10);
@@ -64,6 +72,7 @@ const money = (value) => new Intl.NumberFormat("zh-CN", { style: "currency", cur
 const parseDate = (value) => new Date(`${value}T12:00:00`);
 const formatDate = (date) => new Intl.DateTimeFormat("zh-CN", { month: "short", day: "numeric", weekday: "short" }).format(parseDate(date));
 const formatFullDate = (date) => new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "long", day: "numeric", weekday: "long" }).format(date);
+const formatShortDate = (date) => new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(date);
 const hasCloudConfig = () => Boolean(syncConfig.apiBase && syncConfig.token);
 
 function saveExpenses() {
@@ -248,6 +257,96 @@ function filteredCycleRecords() {
   });
 }
 
+function daysBetween(start, end) {
+  return Math.max(1, Math.round((parseDate(end) - parseDate(start)) / 86400000));
+}
+
+function renderEmptyAnalysis(message) {
+  categoryAnalysisList.innerHTML = `<p class="analysis-empty">${message}</p>`;
+  weeklyAnalysisList.innerHTML = `<p class="analysis-empty">${message}</p>`;
+  analysisInsight.textContent = message;
+}
+
+function renderAnalysis() {
+  const cycle = cycleStats();
+  const totalDays = daysBetween(cycle.start, cycle.end);
+  const today = dateKey(new Date());
+  const elapsedEnd = cycle.offset === 0 ? (today < cycle.end ? today : cycle.displayEnd) : cycle.displayEnd;
+  const elapsedDays = cycle.offset === 0 ? daysBetween(cycle.start, dateKey(new Date(parseDate(elapsedEnd).getTime() + 86400000))) : totalDays;
+  const activeDays = new Set(cycle.records.map((record) => record.date)).size;
+  const largest = cycle.records.reduce((max, record) => record.amount > max.amount ? record : max, { amount: 0, category: "暂无" });
+  const dailyAverage = cycle.total / Math.max(1, elapsedDays);
+  const projected = cycle.offset === 0 ? dailyAverage * totalDays : cycle.total;
+
+  analysisRange.textContent = `${cycle.start} 至 ${cycle.displayEnd}`;
+  analysisDailyAverage.textContent = money(dailyAverage);
+  analysisLargest.textContent = largest.amount ? money(largest.amount) : money(0);
+  analysisActiveDays.textContent = `${activeDays} 天`;
+  analysisProjection.textContent = money(projected);
+
+  if (!cycle.records.length) {
+    renderEmptyAnalysis("这个账期还没有记录，添加几笔后会显示分析。");
+    return;
+  }
+
+  const categoryTotals = cycle.records.reduce((map, record) => {
+    map[record.category] = (map[record.category] || 0) + record.amount;
+    return map;
+  }, {});
+  const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+  categoryAnalysisList.innerHTML = "";
+  sortedCategories.forEach(([category, amount]) => {
+    const row = document.createElement("div");
+    const head = document.createElement("div");
+    const name = document.createElement("strong");
+    const value = document.createElement("span");
+    const bar = document.createElement("div");
+    const fill = document.createElement("span");
+    const percent = cycle.total ? Math.round((amount / cycle.total) * 100) : 0;
+
+    row.className = "analysis-row";
+    head.className = "analysis-row-head";
+    bar.className = "analysis-bar";
+    name.textContent = category;
+    value.textContent = `${money(amount)} · ${percent}%`;
+    fill.style.width = `${Math.max(4, percent)}%`;
+
+    head.append(name, value);
+    bar.append(fill);
+    row.append(head, bar);
+    categoryAnalysisList.append(row);
+  });
+
+  const trendEnd = parseDate(cycle.offset === 0 ? (today < cycle.end ? today : cycle.displayEnd) : cycle.displayEnd);
+  const dayTotals = cycle.records.reduce((map, record) => {
+    map[record.date] = (map[record.date] || 0) + record.amount;
+    return map;
+  }, {});
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(trendEnd);
+    date.setDate(date.getDate() - (6 - index));
+    const key = dateKey(date);
+    return { key, label: formatShortDate(date), amount: dayTotals[key] || 0 };
+  });
+  const maxDayAmount = Math.max(...days.map((day) => day.amount), 1);
+  weeklyAnalysisList.innerHTML = "";
+  days.forEach((day) => {
+    const item = document.createElement("div");
+    item.className = "weekly-bar-item";
+    item.innerHTML = `
+      <span class="weekly-amount">${day.amount ? money(day.amount) : "-"}</span>
+      <div class="weekly-track"><span style="height: ${Math.max(6, (day.amount / maxDayAmount) * 100)}%"></span></div>
+      <span class="weekly-label">${day.label}</span>
+    `;
+    weeklyAnalysisList.append(item);
+  });
+
+  const topCategory = sortedCategories[0];
+  const topPercent = Math.round((topCategory[1] / cycle.total) * 100);
+  const largestText = largest.amount ? `最高单笔是 ${largest.category} ${money(largest.amount)}。` : "";
+  analysisInsight.textContent = `${cycleLabel(cycle.offset)}共 ${cycle.count} 笔，${activeDays} 天有支出；${topCategory[0]}占比最高，为 ${topPercent}%。${largestText}`;
+}
+
 function renderExpenses() {
   list.innerHTML = "";
   const ordered = filteredCycleRecords().sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
@@ -326,6 +425,7 @@ function renderAll() {
   renderCycleControls();
   renderExpenses();
   renderSummary();
+  renderAnalysis();
   renderNote();
   renderDateTools();
   renderTextStats();
